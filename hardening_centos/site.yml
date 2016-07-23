@@ -1,5 +1,6 @@
 ---
-- become: yes
+- hosts: docean_centos
+  become: yes
   roles:
     - firewall
     - NTPS
