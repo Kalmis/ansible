@@ -1,0 +1,15 @@
+---
+- name: Generate passwords
+  shell: python2.7 -c 'import crypt; print crypt.crypt("{{ upassword }}", "$6$random_salt")'
+  register: genpass
+
+- name: Creating user "{{ uusername }}" with group wheel
+  user: name={{ uusername }} password={{ genpass.stdout }} groups=wheel append=yes
+  when: assigned_role == "yes"
+
+- name: Creating users "{{ uusername }}" without group wheel
+  user: name={{ uusername }} password={{ genpass.stdout }}
+  when: assigned_role == "no"
+
+- name: Expiring password for user "{{ uusername }}"
+  shell: chage -d 0 "{{ uusername }}"
