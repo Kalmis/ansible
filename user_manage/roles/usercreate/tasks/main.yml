@@ -13,3 +13,6 @@
 
 - name: Expiring password for user "{{ uusername }}"
   shell: chage -d 0 "{{ uusername }}"
+
+- name: Set locale as en_US.utf8
+  shell: echo "export LANG=en_US.utf8" >> /home/"{{ uusername }}"/.bashrc
