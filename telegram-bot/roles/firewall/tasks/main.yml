@@ -2,11 +2,13 @@
 - name: Disable root ssh login by using template
   template: src=sshd_config.j2 dest=/etc/ssh/sshd_config owner=root group=root mode=0644
 
-- name: Installing required modules for firewalld. python-firewall cocpit
+- name: Install cockpit
   yum: name={{ item }} state=latest
   with_items:
-    - python-firewall
     - cockpit
+
+- name: Update firewalld
+  yum: name=firewalld state=latest
 
 - name: Starting firewalld
   service: name=firewalld state=started
@@ -28,4 +30,5 @@
 
 - name: Setting firewalld to start on boot
   service: name=firewalld enabled=yes
+
 
