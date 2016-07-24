@@ -36,8 +36,14 @@
   make: chdir={{ python_install }} target=altinstall
   when: python_path.stat.exists == False
 
+- name: Allow sudo to /usr/local/bin
+  template: src=sudoers.j2 dest=/etc/sudoers group=root owner=root mode=0440
+
+- name: Add /usr/local/bin to root path
+  template: src=bashrc.j2 dest=/root/.bashrc group=root owner=root mode=0550
+
 - name: Python version check
-  command: /usr/local/bin/python3 --version
+  command: /usr/local/bin/python3.5 --version
   register: py_ver
 
 - name: Right version installed
@@ -61,6 +67,6 @@
 
 - name: Starting script in a screen
   become: no
-  shell: screen -dmS  {{ screen_name }} bash -c  'cd {{ repo_path }}/{{ repo_name }}/src && python3 main.py' && sleep 1
+  shell: screen -dmS  {{ screen_name }} bash -c  'cd {{ repo_path }}/{{ repo_name }}/src && python3.5 main.py' && sleep 1
 
 
