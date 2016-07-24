@@ -1,7 +1,0 @@
----
-- hosts: docean_centos
-  become: yes
-  roles:
-    - firewall
-    - NTPS
-    - swap_file

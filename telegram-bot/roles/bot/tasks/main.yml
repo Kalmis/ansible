@@ -1,0 +1,66 @@
+---
+- name: Shutdown screen, ignore fail
+  become: no
+  shell: screen -X -S {{ screen_name }} kill
+  ignore_errors: yes
+
+- name: Install screen
+  yum: name=screen state=latest
+
+- name: Updating all packages
+  yum: name=* state=latest
+
+- name: Installing yum-utils if needed
+  yum: name=yum-utils state=latest
+
+- name: Install missing dependencies for python3
+  shell: yum-builddep python --assumeyes
+
+- name: Check if python already installed
+  stat: path={{ python_install }}
+  register: python_path
+
+- name: Download python package
+  get_url: url={{ python_url }} dest={{ python_download}} mode=0666
+  when: python_path.stat.exists == False
+
+- name: Unpack the python tgz
+  shell: tar -xf {{ python_download }} -C {{ python_install_path }}
+  when: python_path.stat.exists == False
+
+- name: Set install folder for python
+  shell: cd {{ python_install }} && ./configure --prefix={{ python_install_path }}
+  when: python_path.stat.exists == False
+
+- name: Build python
+  make: chdir={{ python_install }} target=altinstall
+  when: python_path.stat.exists == False
+
+- name: Python version check
+  command: /usr/local/bin/python3 --version
+  register: py_ver
+
+- name: Right version installed
+  fail: msg="Python3 wrong version"
+  when: py_ver.stdout.find('{{ python_version }}') == -1
+
+- name: Install git
+  yum: name=git state=latest
+
+- name: Dowload repo
+  git: repo={{ repo_url }} dest={{ repo_path }}/{{ repo_name }} accept_hostkey=yes force=yes
+
+- name: Install plugins from requirements.txt
+  pip: requirements={{ repo_path }}/{{ repo_name }}/requirements.txt executable=/usr/local/bin/pip3.5
+
+- name: Copy tokens.conf from local path to remote path
+  copy: src={{ local_tokens }} dest={{ remote_tokens }}
+
+- name: Set ownership to user Kalmis
+  file: path={{ repo_path }}/{{ repo_name }} owner=Kalmis group=wheel mode=0777 recurse=yes
+
+- name: Starting script in a screen
+  become: no
+  shell: screen -dmS  {{ screen_name }} bash -c  'cd {{ repo_path }}/{{ repo_name }}/src && python3 main.py' && sleep 1
+
+
