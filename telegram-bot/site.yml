@@ -1,0 +1,21 @@
+---
+- hosts: docean_centos
+  become: yes
+  vars:
+    screen_name: KalmisBot
+    python_version: '3.5.2'
+    python_url: https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz
+    python_install: /usr/local/Python-3.5.2
+    python_download: /usr/local/Python-3.5.2.tgz
+    python_install_path: /usr/local/
+    repo_url: https://github.com/Kalmis/telegram-bot.git
+    repo_path: /opt
+    repo_name: telegram-bot
+    local_tokens: /Users/Kalmis/git/telegram-bot/src/tokens.conf
+    remote_tokens: "{{ repo_path }}/{{ repo_name }}/src/tokens.conf"
+    mainpy_path: "{{ repo_path }}/{{ repo_name }}/src/main.py"
+  roles:
+    - firewall
+    - NTPS
+    - swap_file
+    - bot

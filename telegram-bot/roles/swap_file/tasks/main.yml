@@ -1,0 +1,24 @@
+---
+- name: Check if swap already exists
+  stat: path=/swapfile
+  register: file
+
+- name: Allocate 2gb swap
+  shell: fallocate -l 2G /swapfile
+  when: file.stat.exists == False
+
+- name: Change permissions
+  shell: chmod 600 /swapfile
+  when: file.stat.exists == False
+
+- name: Format the file for swap
+  shell: mkswap /swapfile
+  when: file.stat.exists == False
+
+- name: Turn swap on
+  shell: swapon /swapfile
+  when: file.stat.exists == False
+
+- name: Turn swap on permanently
+  shell: sh -c 'echo "/swapfile none swap sw 0 0" >> /etc/fstab'
+  when: file.stat.exists == False
