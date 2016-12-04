@@ -67,6 +67,6 @@
 
 - name: Starting script in a screen
   become: no
-  shell: screen -dmS  {{ screen_name }} bash -c  'cd {{ repo_path }}/{{ repo_name }}/src && python3.5 main.py' && sleep 1
+  shell: screen -dmSL  {{ screen_name }} bash -c  'cd {{ repo_path }}/{{ repo_name }}/src && python3.5 main.py' && sleep 1
 
 
